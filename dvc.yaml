@@ -1,0 +1,41 @@
+stages:
+  data_split:
+    cmd: python main_code/split.py
+    deps:
+    - main_code/split.py
+    params:
+    - base.random_state
+    - data_source.local_path
+    - split.split_ratio
+    outs:
+    - data/split
+
+  data_processing:
+    cmd: python main_code/preprocess.py data/processed
+    deps:
+    - data/split
+    - main_code/preprocess.py
+    params:
+    - process.dir
+    - process.test_file
+    - process.train_file
+    - split.dir
+    - split.test_file
+    - split.train_file
+    outs:
+    - data/processed
+  train:
+    cmd: python main_code/train.py data/features model/model.pkl
+    deps:
+    - data/processed
+    - main_code/train.py
+    params:
+    - base.random_state
+    - base.target_col
+    - model_dir
+    - process.dir
+    - process.test_file
+    - process.train_file
+    - train.n_est
+    outs:
+    - model/model.pkl
